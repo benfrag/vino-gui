@@ -25,13 +25,14 @@ void GuiCore::init(WindowConfig new_config)
 
 void GuiCore::window_callback(WindowConfig new_config)
 {
-    std::cout << " IN WINDOW CSLLBACK " << new_config.x << std::endl;
+    //update window config renderer etc
+    //should we scale up when window size changes? or should we occupy the new space
 
 }
 
 void GuiCore::process_input()
 {
-
+    window_manager.process_messages();
 };
 
 void GuiCore::run()

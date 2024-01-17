@@ -17,8 +17,9 @@ int main()
 
     try
     {
-        WindowConfig window_config;
-        gui.init(window_config);
+//        WindowConfig window_config;
+//        gui.init(window_config);
+        gui.init();
         gui.run();
     }
     catch (const std::exception& e)
