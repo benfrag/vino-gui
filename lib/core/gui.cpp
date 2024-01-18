@@ -13,26 +13,52 @@ void GuiCore::shutdown()
 
 }
 
-void GuiCore::init(WindowConfig new_config)
+void GuiCore::init()
 {
-    window_config = new_config;
-    window_manager.init(std::bind(&GuiCore::window_callback, this, std::placeholders::_1));
-    window_manager.create_window(&window_config);
-
+//    window_config = new_config;
+//    window_manager.init(std::bind(&GuiCore::window_callback, this, std::placeholders::_1));
+//    window_manager.create_window(&window_config);
 
     is_running = true;
 }
 
-void GuiCore::window_callback(WindowConfig new_config)
+void GuiCore::create_window(std::string label, WindowConfig window_config)
 {
-    //update window config renderer etc
-    //should we scale up when window size changes? or should we occupy the new space
+    if (windows.find(label) != windows.end())
+        throw std::runtime_error("Window Label already exists"); // could just add identifier number to end of window and return the new label?
 
+
+    windows[label] = new WindowManager();
+    WindowManager* window = windows[label];
+    window->init(label, window_config, std::bind(&GuiCore::window_destroy_callback, this, std::placeholders::_1));
+    window->create_window();
+}
+
+void GuiCore::window_destroy_callback(std::string label)
+{
+    windows[label]->shutdown();
+    delete windows[label];
+    windows.erase(label);
 }
 
 void GuiCore::process_input()
 {
-    window_manager.process_messages();
+    for (auto it = windows.begin(); it != windows.end(); )
+    {
+        it->second->process_messages();
+        if (it->second->window_destroyed)
+        {
+            it->second->shutdown();
+            WindowManager* curr = it->second;
+            delete curr;
+            it = windows.erase(it);
+        }
+        else
+            it++;
+    }
+    
+    // if no more windows destroy set is_runnig false
+    // postquitmessage?
 };
 
 void GuiCore::run()
@@ -53,10 +79,16 @@ void GuiCore::run()
 
 void GuiCore::render(float dt)
 {
-
+    for (const auto& [key, value] : windows)
+    {
+        value->render(dt);
+    }
 }
 
 void GuiCore::update(float dt)
 {
-
+    for (const auto& [key, value] : windows)
+    {
+        value->update(dt);
+    }
 }

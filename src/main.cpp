@@ -19,6 +19,15 @@ int main()
     {
 //        WindowConfig window_config;
 //        gui.init(window_config);
+        WindowConfig main_window;
+        gui.create_window("main", main_window);
+        WindowConfig secondary_window;
+        secondary_window.window_width = 400;
+        secondary_window.window_height = 700;
+        gui.create_window("secondary", secondary_window);
+        WindowConfig third_window;
+        gui.create_window("third", third_window);
+
         gui.init();
         gui.run();
     }

@@ -4,17 +4,7 @@
 #include <windows.h>
 #include <functional>
 
-struct WindowConfig
-{
-    std::wstring window_name{L"default_window"};
-    std::wstring class_name{L"default_class"};
-    int width{1280};
-    int height{720};
-    int window_width{1280};
-    int window_height{720};
-    int x = CW_USEDEFAULT;
-    int y = CW_USEDEFAULT;
-};
+#include "core/renderer/renderer.h"
 
 class WindowManager
 {
@@ -22,18 +12,29 @@ public:
     WindowManager();
     ~WindowManager();
 
-    void init(std::function<void(WindowConfig)> update_callback);
+    void init(std::string label, WindowConfig new_config, std::function<void(std::string)> window_destroy_callback);
 
-    bool create_window(WindowConfig* window_config);
+    bool create_window();
     bool process_messages();
 
+    void render(float dt);
+    void update(float dt);
+
+    void shutdown();
+
+    bool window_destroyed;
+
 private:
+    std::string label;
     HWND hwnd;
     HINSTANCE hInstance;
 
+    WindowConfig window_config;
+    Renderer primitive_renderer;
+
     static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
     LRESULT window_proc(UINT umsg, WPARAM wparam, LPARAM lparam);
-    std::function<void(const WindowConfig&)> update_callback;
+    std::function<void(std::string)> window_destroy_callback;
 
 };
 
